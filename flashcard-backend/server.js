@@ -31,33 +31,8 @@ app.post('/echo', async (req, res) => {
 
   try {
 
-    const promptForTxt = `
-The following text file contains a mix of questions and answers. Please read through it and extract each question and its corresponding answer.
-
-Return the result as a JSON array of objects, where each object has:
-- a "question" field
-- an "answer" field
-
-Ignore unrelated content like instructions, headers, or formatting notes.
-
-Respond only with the raw JSON, in this format:
-
-[
-  {
-    "question": "What is an API?",
-    "answer": "An API (Application Programming Interface) allows software components to communicate with each other."
-  },
-  {
-    "question": "What is a function?",
-    "answer": "A function is a block of code that performs a specific task."
-  }
-]
-
-Here is the text:
-"""
-${message}
-"""
-`;
+    var promptForTxt = `Create a list of 10 flashcards with questions and answers based on the following text: "${message}". Each flashcard should have a question and an answer. Format the response as a JSON array of objects, where each object has a "question" and an "answer" field.`;
+  
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -85,29 +60,15 @@ ${message}
 });
 
 app.post('/upload-pdf', upload.any('pdf'), async (req, res) => {
+  
  
   const pdfData = await pdfParse(req.files[0].buffer);
-  const customPrompt = `
-The following is a transcript or study guide that contains multiple **question and answer** pairs. Please extract and format each pair as a JSON array of objects, where each object has two fields: "question" and "answer".
+  // console.log('PDF text:', pdfData.text); // Log the extracted text for debugging
+  var customPrompt = `Create a list of 10 flashcards with questions and answers based on the following text: "${pdfData.text}". Each flashcard should have a question and an answer. Format the response as a JSON array of objects, where each object has a "question" and an "answer" field.`;
 
-Only include actual Q&A content. Ignore titles, section headers, or instructions.
-
-Respond in this exact JSON format:
-
-[
-  { "question": "What is a software engineer?", "answer": "A software engineer develops and maintains software systems." },
-  { "question": "What are the phases of the software development lifecycle?", "answer": "Planning, design, implementation, testing, deployment, and maintenance." }
-]
-
-Here is the raw text:
-
-""" 
-${pdfData.text}
-"""
-`;
 
  
-
+console.log('Custom prompt:', customPrompt); // Log the custom prompt for debugging
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
