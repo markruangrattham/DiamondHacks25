@@ -1,0 +1,26 @@
+# === FRONTEND ===
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.DS_Store
+
+# === BACKEND ===
+backend/node_modules/
+backend/uploads/
+backend/.env
+backend/.DS_Store
+
+# === FLASHCARD APP SUBFOLDERS (if used) ===
+flashcard-client/node_modules/
+flashcard-client/dist/
+flashcard-client/.env
+
+flashcard-backend/node_modules/
+flashcard-backend/uploads/
+flashcard-backend/.env
+
+# === Logs and System Files ===
+*.log
+.DS_Store
+.env
+uploads/
