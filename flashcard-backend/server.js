@@ -30,15 +30,54 @@ app.post('/echo', async (req, res) => {
   }
 
   try {
+
+    const promptForTxt = `
+The following text file contains a mix of questions and answers. Please read through it and extract each question and its corresponding answer.
+
+Return the result as a JSON array of objects, where each object has:
+- a "question" field
+- an "answer" field
+
+Ignore unrelated content like instructions, headers, or formatting notes.
+
+Respond only with the raw JSON, in this format:
+
+[
+  {
+    "question": "What is an API?",
+    "answer": "An API (Application Programming Interface) allows software components to communicate with each other."
+  },
+  {
+    "question": "What is a function?",
+    "answer": "A function is a block of code that performs a specific task."
+  }
+]
+
+Here is the text:
+"""
+${message}
+"""
+`;
+
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: message }],
+      messages: [{ role: "user", content: promptForTxt }],
       temperature: 0.7
     });
 
     const reply = completion.choices[0].message.content.trim();
-    res.json({ reply });
-    console.log("GPT response:", reply);
+    console.log('GPT reply:', reply);
+    let parsed;
+    parsed = JSON.parse(reply); // now an array of objects
+
+    const questions = parsed.map(item => item.question);
+    const answers = parsed.map(item => item.answer);
+
+    console.log('✅ Questions:', questions);
+    console.log('✅ Answers:', answers);
+
+  // If you want to send this to the frontend
+  res.json({ questions, answers });
   } catch (err) {
     console.error("GPT API error:", err);
     res.status(500).json({ error: "ChatGPT API call failed" });

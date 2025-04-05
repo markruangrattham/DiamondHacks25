@@ -1,32 +1,38 @@
 // App.jsx
 import { useState } from 'react';
 
-
-
 function App() {
   const [mode, setMode] = useState('text');
   const [input, setInput] = useState('');
-  const [response, setResponse] = useState('');
-  const [file , setFile] = useState(null);
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
-
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   const handleTextSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const res = await fetch('http://localhost:3001/echo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: input }),
-    });
+    try {
+      const res = await fetch('http://localhost:3001/echo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input }),
+      });
 
-    const data = await res.json();
-    setResponse(data.reply);
-    setLoading(false);
+      const data = await res.json();
+      setQuestions(data.questions);
+      setAnswers(data.answers);
+      setCurrentIndex(0);
+      setShowAnswer(false);
+      setInput('');
+    } catch (error) {
+      console.error('Text submission error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -38,17 +44,23 @@ function App() {
 
     setLoading(true);
 
-    const res = await fetch('http://localhost:3001/upload-pdf', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const res = await fetch('http://localhost:3001/upload-pdf', {
+        method: 'POST',
+        body: formData,
+      });
 
-    const data = await res.json();
-    setResponse(data.questions);
-    setAnswers(data.answers);
-    setLoading(false);
+      const data = await res.json();
+      setQuestions(data.questions);
+      setAnswers(data.answers);
+      setCurrentIndex(0);
+      setShowAnswer(false);
+    } catch (error) {
+      console.error('File upload error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
-
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -93,15 +105,58 @@ function App() {
         </form>
       )}
 
-      {/* Output */}
-      {response && (
-        <div style={{ marginTop: '2rem', whiteSpace: 'pre-wrap' }}>
-          <strong>Response:</strong>
-          <br />
-          
-          {response}
-          
-          {answers}
+      {/* Flashcard Display */}
+      {questions.length > 0 && answers.length > 0 && (
+        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+          <h2>Flashcard {currentIndex + 1} of {questions.length}</h2>
+
+          <div style={{
+  margin: '1rem auto',
+  padding: '2rem',
+  border: '2px solid #ccc',
+  borderRadius: '12px',
+  maxWidth: '600px',
+  minHeight: '150px',
+  background: '#f9f9f9',
+  fontSize: '1.2rem',
+  color: '#111', // ✅ ADD THIS
+}}>
+            <strong>Q:</strong> {questions[currentIndex]}
+            {showAnswer && (
+              <div style={{ marginTop: '1rem', color: '#2a8a2a' }}>
+                <strong>A:</strong> {answers[currentIndex]}
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <button onClick={() => setShowAnswer(prev => !prev)}>
+              {showAnswer ? 'Hide Answer' : 'Show Answer'}
+            </button>
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <button
+              onClick={() => {
+                setCurrentIndex((prev) => Math.max(0, prev - 1));
+                setShowAnswer(false);
+              }}
+              disabled={currentIndex === 0}
+              style={{ marginRight: '1rem' }}
+            >
+              Previous
+            </button>
+
+            <button
+              onClick={() => {
+                setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1));
+                setShowAnswer(false);
+              }}
+              disabled={currentIndex === questions.length - 1}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>
