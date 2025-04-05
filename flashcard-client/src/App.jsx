@@ -10,6 +10,9 @@ function App() {
   const [file , setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
+
 
   const handleTextSubmit = async (e) => {
     e.preventDefault();
@@ -41,11 +44,8 @@ function App() {
     });
 
     const data = await res.json();
-    setResponse(
-      data.flashcards
-        ? JSON.stringify(data.flashcards, null, 2)
-        : 'No flashcards returned'
-    );
+    setResponse(data.questions);
+    setAnswers(data.answers);
     setLoading(false);
   };
 
@@ -98,7 +98,10 @@ function App() {
         <div style={{ marginTop: '2rem', whiteSpace: 'pre-wrap' }}>
           <strong>Response:</strong>
           <br />
+          
           {response}
+          
+          {answers}
         </div>
       )}
     </div>
