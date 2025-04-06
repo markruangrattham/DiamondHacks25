@@ -55,6 +55,7 @@ function App() {
       setAnswers(data.answers);
       setCurrentIndex(0);
       setShowAnswer(false);
+      setFile(null);
     } catch (error) {
       console.error('File upload error:', error);
     } finally {
@@ -98,6 +99,7 @@ function App() {
             type="file"
             accept=".pdf"
             onChange={(e) => setFile(e.target.files[0])}
+          
           />
           <button type="submit" disabled={loading}>
             {loading ? 'Uploading...' : 'Upload & Generate'}
@@ -119,7 +121,7 @@ function App() {
   minHeight: '150px',
   background: '#f9f9f9',
   fontSize: '1.2rem',
-  color: '#111', // ✅ ADD THIS
+  color: '#111', 
 }}>
             <strong>Q:</strong> {questions[currentIndex]}
             {showAnswer && (

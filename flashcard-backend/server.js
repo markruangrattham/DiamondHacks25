@@ -43,7 +43,7 @@ app.post('/echo', async (req, res) => {
     const reply = completion.choices[0].message.content.trim();
     console.log('GPT reply:', reply);
     let parsed;
-    parsed = JSON.parse(reply); // now an array of objects
+    parsed = JSON.parse(cleanGPTResponse(reply)); // now an array of objects
 
     const questions = parsed.map(item => item.question);
     const answers = parsed.map(item => item.answer);
@@ -78,7 +78,7 @@ console.log('Custom prompt:', customPrompt); // Log the custom prompt for debugg
 
     const reply = completion.choices[0].message.content.trim();
     let parsed;
-  parsed = JSON.parse(reply); // now an array of objects
+  parsed = JSON.parse(cleanGPTResponse(reply)); // now an array of objects
 
   const questions = parsed.map(item => item.question);
   const answers = parsed.map(item => item.answer);
@@ -95,6 +95,26 @@ console.log('Custom prompt:', customPrompt); // Log the custom prompt for debugg
   }
   
 });
+
+function cleanGPTResponse(rawText) {
+  // Remove triple backticks and optional language tags (like ```json or ```)
+  let cleaned = rawText.trim().replace(/```(?:json)?/g, '').replace(/```/g, '');
+
+  // Remove anything before the first bracket
+  const firstBracket = cleaned.indexOf('[');
+  if (firstBracket > 0) {
+    cleaned = cleaned.slice(firstBracket);
+  }
+
+  // Optional: remove anything after the last bracket (sometimes GPT adds a comment)
+  const lastBracket = cleaned.lastIndexOf(']');
+  if (lastBracket !== -1) {
+    cleaned = cleaned.slice(0, lastBracket + 1);
+  }
+
+  return cleaned;
+}
+
   
 
 app.listen(port, () => {
