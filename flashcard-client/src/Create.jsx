@@ -65,6 +65,7 @@ export default function Create() {
       navigate('/flashcards', { state: { questions: data.questions, answers: data.answers } }); // Pass data via state
     } catch (err) {
       console.error('File upload failed', err);
+      alert('File upload failed. Please try again.');
     } finally {
       setLoading(false);
     }

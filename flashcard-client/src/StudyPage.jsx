@@ -47,7 +47,7 @@ const StudyPage = ({ user, loading }) => {
     navigate('/edit-flashcards', { state: { editing: true, setId, setName } });
   };
 
-  if (loading || fetching) return <p>Loading flashcard sets...</p>;
+//   if (loading || fetching) return <p>Loading flashcard sets...</p>;
   if (!user) {
     navigate('/login');
     return null;
