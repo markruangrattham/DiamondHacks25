@@ -184,3 +184,17 @@ button[type="submit"]:disabled {
   color: #aaa;
   cursor: not-allowed;
 }
+.save-btn {
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: #3da344;
+}

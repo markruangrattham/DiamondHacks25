@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from './firebase';
 import ForgotPassword from './ForgotPassword';
 import Login from './Login';
 import Register from './Register';
 import './App.css';
+import { collection, addDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -18,6 +19,8 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [setName, setSetName] = useState('');
+
   const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
@@ -68,6 +71,42 @@ function App() {
     setAnswers(data.answers);
     setLoading(false);
   };
+
+
+  
+  const saveFlashcardSet = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please log in to save flashcards.");
+      return;
+    }
+  
+    if (!setName.trim()) {
+      alert("Please enter a name for your flashcard set.");
+      return;
+    }
+  
+    const flashcards = questions.map((q, i) => ({
+      question: q,
+      answer: answers[i],
+    }));
+  
+    try {
+      const ref = collection(db, "users", user.uid, "flashcardSets");
+      await addDoc(ref, {
+        name: setName.trim(),
+        createdAt: new Date(),
+        flashcards
+      });
+      alert("✅ Flashcard set saved!");
+      setSetName(''); // clear input
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("❌ Failed to save flashcard set.");
+    }
+  };
+  
+  
 
   return (
     <Router>
@@ -171,6 +210,28 @@ function App() {
                   </div>
                 </div>
               )}
+              {user && questions.length > 0 && answers.length > 0 && (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <input
+      type="text"
+      value={setName}
+      onChange={(e) => setSetName(e.target.value)}
+      placeholder="Enter flashcard set name"
+      style={{
+        padding: '0.5rem',
+        borderRadius: '8px',
+        border: '1px solid #ccc',
+        fontSize: '1rem',
+        width: '250px',
+        marginRight: '1rem'
+      }}
+    />
+    <button onClick={saveFlashcardSet} className="save-btn">
+      💾 Save Flashcard Set
+    </button>
+  </div>
+)}
+
             </div>
           }
         />
