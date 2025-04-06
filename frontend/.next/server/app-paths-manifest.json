@@ -1,5 +1,0 @@
-{
-  "/api/flashcards/route": "app/api/flashcards/route.js",
-  "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
-}

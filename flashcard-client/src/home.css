@@ -1,0 +1,181 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global Styles */
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  overflow-x: hidden;  /* Prevent horizontal scrolling */
+  display: block;
+}
+
+/* Full-Screen Layout */
+.full-screen {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+  text-align: center;         /* Center content horizontally */
+  margin: 0;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;         /* Padding around the navbar */
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;                /* Ensure the navbar spans the whole screen */
+  position: fixed;            /* Fix the navbar to the top */
+  top: 0;
+  left: 0;
+  z-index: 100;               /* Ensure it's above other content */
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.navbar-right {
+  text-align: right;
+}
+
+.navbar-right a {
+  margin-left: 1.5rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.get-started {
+  background-color: #8b3dff;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.get-started:hover {
+  background-color: #722ed1;
+}
+
+.learn-more {
+  background-color: white;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-left: 1rem;
+}
+
+
+/* Centered Content */
+.content-center {
+  padding: 1rem 2rem;
+  width: 100%;
+  margin: 0 auto;            /* Center the content */
+}
+
+/* Content Layout */
+.content-layout {
+  width: 100%;
+  max-width: 1200px;           /* Ensures content doesn't stretch too wide */
+  margin: 0 auto;              /* Center content horizontally */
+  padding: 2rem;
+  box-sizing: border-box;
+  display: block;              /* Remove flexbox to avoid stretching */
+}
+
+/* Text Block */
+.text-block {
+  margin-bottom: 1.5rem;
+  padding: 1rem;               /* Padding for the text block */
+}
+
+.main-heading {
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: #111;
+  margin-bottom: 1rem;
+}
+
+.subtext {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  justify-content: center;  /* Center the buttons horizontally */
+  gap: 1rem;
+  margin-top: 2rem;          /* Add spacing above buttons */
+}
+
+/* Button Styles */
+.get-started, .learn-more {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.get-started {
+  background-color: #8b3dff;
+  color: #fff;
+}
+
+.learn-more {
+  background-color: white;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+
+/* Image Block */
+.image-block {
+  margin-top: 2rem;
+}
+
+.responsive-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;  /* Ensures the image scales well */
+}
+
+/* Autoscale the layout for smaller screens */
+@media (max-width: 768px) {
+  .main-heading {
+    font-size: 1.8rem;       /* Reduce font size on smaller screens */
+  }
+
+  .subtext {
+    font-size: 1rem;         /* Adjust font size for smaller screens */
+  }
+
+  .button-group {
+    width: 100%;             /* Make buttons take up full width */
+    display: flex;
+    justify-content: center; /* Center buttons on mobile */
+  }
+
+  .responsive-image {
+    max-height: 300px;       /* Adjust image size on mobile */
+  }
+}
