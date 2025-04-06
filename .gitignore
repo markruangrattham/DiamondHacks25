@@ -24,3 +24,6 @@ flashcard-backend/.env
 .DS_Store
 .env
 uploads/
+node_modules/
+package-lock.json
+package.json

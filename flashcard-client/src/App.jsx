@@ -1,5 +1,13 @@
 // App.jsx
 import { useState } from 'react';
+import { auth, provider } from  '.'
+import { signInWithPopup } from 'firebase/auth';
+
+const handleLogin = async () => {
+  const result = await signInWithPopup(auth, provider);
+  console.log('Logged in user:', result.user);
+};
+
 
 function App() {
   const [mode, setMode] = useState('text');
