@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
+import { useNavigate } from 'react-router-dom'; // useNavigate hook
 import './Create.css';
 
 export default function Create() {
@@ -11,8 +12,8 @@ export default function Create() {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [numQuestions, setNumQuestions] = useState(5); // State for the number of questions
+  const navigate = useNavigate(); // Initialize navigate hook
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -28,12 +29,13 @@ export default function Create() {
       const res = await fetch('http://localhost:3001/echo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input })
+        body: JSON.stringify({ message: input, numQuestions }), // Send numQuestions in request
       });
       const data = await res.json();
       setQuestions(data.questions);
       setAnswers(data.answers);
       setInput('');
+      navigate('/flashcards', { state: { questions: data.questions, answers: data.answers } }); // Pass data via state
     } catch (err) {
       console.error('Text submission failed', err);
     } finally {
@@ -46,15 +48,18 @@ export default function Create() {
     if (!file) return alert('Please select a PDF file');
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('numQuestions', numQuestions); // Add numQuestions to the form data
+
     setLoading(true);
     try {
       const res = await fetch('http://localhost:3001/upload-pdf', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
       const data = await res.json();
       setQuestions(data.questions);
       setAnswers(data.answers);
+      navigate('/flashcards', { state: { questions: data.questions, answers: data.answers } }); // Pass data via state
     } catch (err) {
       console.error('File upload failed', err);
     } finally {
@@ -64,57 +69,77 @@ export default function Create() {
 
   return (
     <div className="create-container">
-      <h1>📚 Welcome to FlashcardGPT</h1>
-      {user && <p className="user-info">Logged in as <strong>{user.email}</strong></p>}
-      <p>You can use the site whether signed in or not. Sign in to save progress!</p>
+      {/* Navbar */}
+      <header className="navbar">
+        <div className="logo">📖 StudyGenius</div>
+        <nav className="navbar-right">
+          <a href="/">Home</a>
+          <a href="/create">Create</a>
+          <a href="/study">Study</a>
+          {user ? (
+            <button onClick={() => auth.signOut()}>Logout</button>
+          ) : (
+            <a href="/login">
+              <button className="get-started">Login</button>
+            </a>
+          )}
+        </nav>
+      </header>
 
-      <div className="mode-toggle">
-        <button onClick={() => setMode('text')} className={mode === 'text' ? 'active' : ''}>Text Input</button>
-        <button onClick={() => setMode('file')} className={mode === 'file' ? 'active' : ''}>Upload PDF</button>
-      </div>
+      <div className="main-content">
+        <h1>Generate Flashcards</h1>
+        <p className="description">
+          Enter a prompt or lecture notes to generate flashcards for studying.
+        </p>
 
-      {mode === 'text' ? (
-        <form onSubmit={handleTextSubmit} className="input-form">
-          <input
-            type="text"
-            placeholder="Type your content..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <button type="submit" disabled={loading}>{loading ? 'Sending...' : 'Send'}</button>
-        </form>
-      ) : (
-        <form onSubmit={handleFileUpload} className="input-form">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-          <button type="submit" disabled={loading}>{loading ? 'Uploading...' : 'Upload & Generate'}</button>
-        </form>
-      )}
-
-      {questions.length > 0 && answers.length > 0 && (
-        <div className="flashcard-section">
-          <h2>Flashcard {currentIndex + 1} of {questions.length}</h2>
-          <div className="flashcard">
-            <p><strong>Q:</strong> {questions[currentIndex]}</p>
-            {showAnswer && <p className="answer"><strong>A:</strong> {answers[currentIndex]}</p>}
-            <button onClick={() => setShowAnswer(!showAnswer)}>
-              {showAnswer ? 'Hide Answer' : 'Show Answer'}
-            </button>
-          </div>
-
-          <div className="nav-buttons">
-            <button onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}>
-              Previous
-            </button>
-            <button onClick={() => setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1))} disabled={currentIndex === questions.length - 1}>
-              Next
-            </button>
-          </div>
+        <div className="mode-toggle">
+          <button onClick={() => setMode('text')} className={mode === 'text' ? 'active' : ''}>
+            Text Input
+          </button>
+          <button onClick={() => setMode('file')} className={mode === 'file' ? 'active' : ''}>
+            Upload PDF
+          </button>
         </div>
-      )}
+
+        {/* Number of Questions Slider */}
+        <div className="question-slider">
+          <label htmlFor="numQuestions">Number of Questions (note will not always give exact number of questions):</label>
+          <input
+            type="range"
+            id="numQuestions"
+            min="1"
+            max="20"
+            value={numQuestions}
+            onChange={(e) => setNumQuestions(Number(e.target.value))}
+          />
+          <span>{numQuestions}</span>
+        </div>
+
+        {mode === 'text' ? (
+          <form onSubmit={handleTextSubmit} className="input-form">
+            <input
+              type="text"
+              placeholder="Type your content..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? 'Sending...' : 'Send'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleFileUpload} className="input-form">
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? 'Uploading...' : 'Upload & Generate'}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

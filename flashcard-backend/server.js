@@ -21,18 +21,16 @@ const openai = new OpenAI({
 // Multer setup for file upload (in memory)
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Text echo endpoint
+// Text echo endpoint with dynamic number of questions
 app.post('/echo', async (req, res) => {
-  const { message } = req.body;
+  const { message, numQuestions } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: 'Missing message in request body' });
+  if (!message || !numQuestions) {
+    return res.status(400).json({ error: 'Missing message or numQuestions in request body' });
   }
 
   try {
-
-    var promptForTxt = `Create a list of 10 flashcards with questions and answers based on the following text: "${message}". Each flashcard should have a question and an answer. Format the response as a JSON array of objects, where each object has a "question" and an "answer" field.`;
-  
+    const promptForTxt = `Create a list of ${numQuestions} flashcards with questions and answers based on the following text: "${message}". Each flashcard should have a question and an answer. Format the response as a JSON array of objects, where each object has a "question" and an "answer" field.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -41,9 +39,7 @@ app.post('/echo', async (req, res) => {
     });
 
     const reply = completion.choices[0].message.content.trim();
-    console.log('GPT reply:', reply);
-    let parsed;
-    parsed = JSON.parse(cleanGPTResponse(reply)); // now an array of objects
+    let parsed = JSON.parse(cleanGPTResponse(reply)); // now an array of objects
 
     const questions = parsed.map(item => item.question);
     const answers = parsed.map(item => item.answer);
@@ -51,49 +47,51 @@ app.post('/echo', async (req, res) => {
     console.log('✅ Questions:', questions);
     console.log('✅ Answers:', answers);
 
-  // If you want to send this to the frontend
-  res.json({ questions, answers });
+    // If you want to send this to the frontend
+    res.json({ questions, answers });
   } catch (err) {
     console.error("GPT API error:", err);
     res.status(500).json({ error: "ChatGPT API call failed" });
   }
 });
 
+// File upload endpoint with dynamic number of questions
 app.post('/upload-pdf', upload.any('pdf'), async (req, res) => {
-  
- 
+  const { numQuestions } = req.body; // Get the number of questions from the body
+
+  if (!numQuestions) {
+    return res.status(400).json({ error: 'Missing numQuestions in request body' });
+  }
+
   const pdfData = await pdfParse(req.files[0].buffer);
-  // console.log('PDF text:', pdfData.text); // Log the extracted text for debugging
-  var customPrompt = `Create a list of 10 flashcards with questions and answers based on the following text: "${pdfData.text}". Each flashcard should have a question and an answer. Format the response as a JSON array of objects, where each object has a "question" and an "answer" field.`;
 
+  var customPrompt = `Create a list of exactly ${numQuestions} flashcards with questions and answers based on the following text: "${pdfData.text}". Feel free to create your own that is related to this topic that is not on the given text. Each flashcard should have a question and an answer. Format the response as a JSON array of objects, where each object has a "question" and an "answer" field.`;
 
- 
-console.log('Custom prompt:', customPrompt); // Log the custom prompt for debugging
+  console.log('Custom prompt:', customPrompt); // Log the custom prompt for debugging
+
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.0-turbo",
       messages: [{ role: "user", content: customPrompt }],
       temperature: 0.7
     });
 
     const reply = completion.choices[0].message.content.trim();
-    let parsed;
-  parsed = JSON.parse(cleanGPTResponse(reply)); // now an array of objects
+    let parsed = JSON.parse(cleanGPTResponse(reply)); // now an array of objects
 
-  const questions = parsed.map(item => item.question);
-  const answers = parsed.map(item => item.answer);
+    const questions = parsed.map(item => item.question);
+    const answers = parsed.map(item => item.answer);
 
-  console.log('✅ Questions:', questions);
-  console.log('✅ Answers:', answers);
+    console.log('✅ Questions:', questions);
+    console.log('✅ Answers:', answers);
 
-  // If you want to send this to the frontend
-  res.json({ questions, answers });
-    
+    // If you want to send this to the frontend
+    res.json({ questions, answers });
+
   } catch (err) {
     console.error("GPT API error:", err);
     res.status(500).json({ error: "ChatGPT API call failed" });
   }
-  
 });
 
 function cleanGPTResponse(rawText) {
@@ -114,8 +112,6 @@ function cleanGPTResponse(rawText) {
 
   return cleaned;
 }
-
-  
 
 app.listen(port, () => {
   console.log(`✅ Server running at http://localhost:${port}`);

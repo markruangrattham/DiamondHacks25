@@ -1,0 +1,218 @@
+/* Flashcards Page */
+.flashcard-page {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .flashcards-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  /* Flashcard Styling */
+  .flashcard {
+    width: 300px;
+    height: 200px;
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .flashcard-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+  }
+  
+  .flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+  }
+  
+  /* Front and Back of Flashcard */
+  .flashcard-front,
+  .flashcard-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+  }
+  
+  .flashcard-front {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  
+  .flashcard-back {
+    background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotateY(180deg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  
+  /* Button Styling */
+  button {
+    background-color: #6c5ce7;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+  }
+  
+  button:hover {
+    background-color: #5a4bcf;
+  }
+  
+  /* Delete Button Styling */
+  button.delete {
+    background-color: #f2f2f2;  /* Light gray color for default */
+    color: #d9534f;  /* Red color text */
+    padding: 8px 12px;
+    border: 2px solid #d9534f;  /* Red border */
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  button.delete:hover {
+    background-color: #f44336; /* Bright red when hovered */
+    color: white;  /* Text turns white on hover */
+  }
+  
+  button.delete:focus {
+    outline: none;  /* Remove default outline on focus */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .flashcards-list {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .flashcard {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+  
+ /* Notification Styles */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+  }
+  
+  /* Delete notification (red) */
+  .delete-notification {
+    background-color: #f44336; /* Red background */
+    color: white;
+  }
+  
+  .add-notification {
+    background-color: #4CAF50; /* Green background */
+    color: white;
+  }
+  
+  .notification p {
+    margin: 0;
+    color: #fff; /* Ensure the text is white */
+  }
+  
+  .notification.hidden {
+    opacity: 0;
+  }
+  
+  
+  /* Hover effect on delete button */
+  button.delete {
+    background-color: #e74c3c; /* Red color for the delete button */
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  button.delete:hover {
+    background-color: #c0392b;  /* Darker red when hovered */
+  }
+  
+  button.delete:focus {
+    outline: none;  /* Remove default outline on focus */
+  }
+/* Add Question Section */
+.add-question {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  
+  .add-question input {
+    width: 100%;
+    max-width: 400px; /* Limit input width */
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    background-color: #f8f8f8; /* Light gray background */
+    color: #333; /* Dark text for better contrast */
+    transition: border-color 0.3s ease; /* Smooth transition */
+  }
+  
+  .add-question input:focus {
+    outline: none; /* Remove default focus outline */
+    border-color: #6c5ce7; /* Highlight border when focused */
+    background-color: #fff; /* White background on focus */
+  }
+  
+  .add-question input::placeholder {
+    color: #888;
+  }
+  
+  .add-question button {
+    background-color: #6c5ce7;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-question button:hover {
+    background-color: #5a4bcf;
+  }
+  
+  

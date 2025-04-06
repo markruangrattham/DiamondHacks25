@@ -9,16 +9,11 @@ body, html {
   overflow-x: hidden;  /* Prevent horizontal scrolling */
 }
 
-/* Layout */
-.full-screen {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  justify-content: flex-start;  /* Align items at the top */
-  align-items: center;          /* Center content horizontally */
+/* Full-Screen Layout */
+.create-container {
+  margin-top: 6rem;  /* Account for fixed navbar */
+  padding: 0 2rem;
   text-align: center;
-  overflow: hidden;             /* Prevent any overflow */
 }
 
 /* Navbar */
@@ -26,68 +21,251 @@ body, html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2rem;
+  padding: 1rem 2rem;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   width: 100%;
-  z-index: 10;
+  position: fixed;  /* Make navbar fixed at the top */
+  top: 0;
+  left: 0;
+  z-index: 100;  /* Ensure navbar is on top */
 }
 
-/* Content Layout */
-.content-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 3rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 1200px; /* Ensures content doesn't stretch too wide */
-  box-sizing: border-box;
-  margin-top: 3rem;  /* Ensures content doesn't overlap with navbar */
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
 }
 
-/* Text Block */
-.text-block {
-  flex: 1;
-  min-width: 280px;
-  max-width: 600px;
-  text-align: center;
+/* Main Content */
+.main-content {
+  margin-top: 3rem;  /* Ensure space from navbar */
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.main-heading {
-  font-size: 2.4rem;
+h1 {
+  font-size: 2.5rem;
   font-weight: bold;
   color: #111;
   margin-bottom: 1rem;
 }
 
-.subtext {
-  font-size: 1.1rem;
+.description {
+  font-size: 1.2rem;
   color: #555;
   margin-bottom: 2rem;
-  line-height: 1.6;
 }
 
-.button-group {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-/* Image Block */
-.image-block {
-  flex: 1;
-  min-width: 280px;
-  max-width: 500px;
+.mode-toggle {
   display: flex;
   justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.mode-toggle button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease;
+}
+
+.mode-toggle button.active {
+  background-color: #8b3dff;
+  color: white;
+}
+
+.input-form {
+  margin-top: 1.5rem;
+}
+
+/* Input Field Styling */
+.input-form input {
+  padding: 0.8rem 1.2rem;  /* Increased padding for better visual appeal */
+  font-size: 1.1rem;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 1rem;
+  border: 2px solid #ccc;  /* Slightly thicker border */
+  border-radius: 12px;  /* More rounded corners */
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #333;
+  transition: all 0.3s ease;  /* Smooth transitions */
+}
+
+.input-form input:focus {
+  border-color: #8b3dff;  /* Change border color on focus */
+  outline: none;  /* Remove default outline */
+  box-shadow: 0 0 10px rgba(139, 61, 255, 0.5);  /* Add a soft shadow */
+}
+
+.input-form input::placeholder {
+  color: #aaa;  /* Lighter color for placeholder */
+  font-style: italic;  /* Make placeholder text look more subtle */
+}
+
+.input-form button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: #8b3dff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.input-form button:disabled {
+  background-color: #ddd;
+}
+
+.create-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.flashcard-section {
+  margin-top: 2rem;
+}
+
+.flashcards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   align-items: center;
 }
 
-.responsive-image {
-  width: 100%;
-  height: auto;
-  max-height: 400px;
-  object-fit: contain;
+.flashcard {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 500px;
+  text-align: left;
+  transition: transform 0.3s ease-in-out;
 }
+
+.flashcard:hover {
+  transform: translateY(-5px);
+}
+
+.flashcard button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #8b3dff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.flashcard button:hover {
+  background-color: #722ed1;
+}
+
+.nav-buttons {
+  margin-top: 1rem;
+}
+
+.nav-buttons button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: #8b3dff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin: 0 0.5rem;
+}
+
+.nav-buttons button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+button {
+  cursor: pointer;
+}
+/* Styling for the question slider container */
+.question-slider {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Label for the slider */
+.question-slider label {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #444;
+  text-align: center;
+  max-width: 300px; /* Prevent text from overflowing */
+}
+
+/* Styling for the range input (slider) */
+.question-slider input {
+  -webkit-appearance: none;
+  width: 80%;
+  max-width: 500px;
+  height: 10px;
+  background: #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: background-color 0.3s ease;
+  margin-bottom: 5px;
+}
+
+.question-slider input:hover {
+  background: #6c5ce7; /* Change color when hovered */
+}
+
+/* Custom thumb for the slider */
+.question-slider input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #6c5ce7;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.question-slider input::-webkit-slider-thumb:hover {
+  background: #5a4bcf; /* Darker shade when hovered */
+}
+
+.question-slider input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #6c5ce7;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.question-slider input::-moz-range-thumb:hover {
+  background: #5a4bcf; /* Darker shade when hovered */
+}
+
+/* Styling for the question count */
+.question-slider span {
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: bold;
+}
+
+
+
