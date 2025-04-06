@@ -97,7 +97,8 @@ body, html {
   margin: 0 auto;              /* Center content horizontally */
   padding: 2rem;
   box-sizing: border-box;
-  display: block;              /* Remove flexbox to avoid stretching */
+  display: block;    
+  margin-top: 100px;          /* Remove flexbox to avoid stretching */
 }
 
 /* Text Block */

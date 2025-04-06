@@ -1,8 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { auth } from './firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import './Flashcards.css'; // Import your CSS file
+import { db, addDoc, collection } from './firebase';  // Import Firestore methods
+import './Flashcards.css';
 
 const Flashcards = () => {
   const { state } = useLocation(); // Access passed state
@@ -12,18 +11,11 @@ const Flashcards = () => {
   const [currentAnswers, setCurrentAnswers] = useState(answers); // Track the current set of answers
   const [newQuestion, setNewQuestion] = useState(''); // State for new question input
   const [newAnswer, setNewAnswer] = useState(''); // State for new answer input
-  const [showDeleteNotification, setShowDeleteNotification] = useState(false); // State for delete notification
+  const [flashcardName, setFlashcardName] = useState(''); // State for flashcard set name
+  const [showNotification, setShowNotification] = useState(false); // State to show notification
   const [showAddNotification, setShowAddNotification] = useState(false); // State for add question notification
+  const [showModal, setShowModal] = useState(false); // State for showing modal popup
 
-  const [user, setUser] = useState(null);  
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
- 
-  
   const handleFlip = (index) => {
     setFlippedCards((prev) => {
       const newFlippedCards = [...prev];
@@ -46,25 +38,46 @@ const Flashcards = () => {
     setCurrentQuestions(updatedQuestions); // Update the state with the remaining questions
     setCurrentAnswers(updatedAnswers); // Update the state with the remaining answers
 
-    // Show delete notification
-    setShowDeleteNotification(true);
-    setTimeout(() => setShowDeleteNotification(false), 3000); // Hide notification after 3 seconds
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000); // Hide notification after 3 seconds
   };
 
   const handleAddQuestion = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) {
-      return; // If no question or answer is entered, do nothing
+      return;
     }
 
     setCurrentQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
     setCurrentAnswers((prevAnswers) => [...prevAnswers, newAnswer]);
-    setNewQuestion(''); // Clear input after adding question
-    setNewAnswer(''); // Clear input after adding answer
-
-    // Show add notification
+    setNewQuestion('');
+    setNewAnswer('');
     setShowAddNotification(true);
-    setTimeout(() => setShowAddNotification(false), 3000); // Hide notification after 3 seconds
+    setTimeout(() => setShowAddNotification(false), 3000);
   };
+
+  // Function to save the flashcard set to Firestore
+  const handleSave = async () => {
+    if (!flashcardName.trim()) {
+      alert('Please enter a name for the flashcard set');
+      return;
+    }
+
+    try {
+      // Save to Firestore
+      const docRef = await addDoc(collection(db, 'flashcardSets'), {
+        name: flashcardName,
+        questions: currentQuestions,
+        answers: currentAnswers,
+        createdAt: new Date(),
+      });
+      console.log('Flashcard set saved with ID: ', docRef.id);
+      alert('Flashcard set saved successfully!');
+    } catch (e) {
+      console.error('Error adding document: ', e);
+      alert('Error saving flashcard set');
+    }
+  };
+
   return (
     <div className="create-container">
       {/* Navbar */}
@@ -74,60 +87,19 @@ const Flashcards = () => {
           <a href="/">Home</a>
           <a href="/create">Create</a>
           <a href="/study">Study</a>
-          {user ? (
-            <button onClick={() => auth.signOut()}>Logout</button>
-          ) : (
-            <a href="/login">
-              <button className="get-started">Login</button>
-            </a>
-          )}
         </nav>
       </header>
 
       <div className="main-content">
-        <h1>Flashcards</h1>
+        <h1>Add A FlashCard</h1>
         
-        {/* Notification for Deletion */}
-        {showDeleteNotification && (
-          <div className="notification delete-notification">
+        {/* Notification */}
+        {showNotification && (
+          <div className="notification">
             <p>Flashcard has been deleted</p>
           </div>
         )}
-
-        {/* Notification for Adding a New Question */}
-        {showAddNotification && (
-          <div className="notification add-notification">
-            <p>New flashcard has been added</p>
-          </div>
-        )}
-
-        <div className="flashcard-page">
-          <h1>Flashcards</h1>
-          <div className="flashcards-list">
-            {currentQuestions && currentAnswers && currentQuestions.length > 0 ? (
-              currentQuestions.map((question, index) => (
-                <div key={index} className="flashcard">
-                  <p><strong>Q:</strong> {question}</p>
-                  {/* Button to flip the card */}
-                  <button onClick={() => handleFlip(index)}>
-                    {flippedCards.includes(index) ? 'Hide Answer' : 'Flip to Show Answer'}
-                  </button>
-                  {/* Conditionally render the answer if the card is flipped */}
-                  {flippedCards.includes(index) && (
-                    <p><strong>A:</strong> {currentAnswers[index]}</p>
-                  )}
-                  {/* Delete button */}
-                  <button className="delete" onClick={() => handleDelete(index)}>
-                    Delete
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p>No flashcards to show.</p>
-            )}
-          </div>
-        </div>
-
+        
         {/* Add New Question */}
         <div className="add-question">
           <input
@@ -144,6 +116,55 @@ const Flashcards = () => {
           />
           <button onClick={handleAddQuestion}>Add Question</button>
         </div>
+
+        {/* Flashcard List */}
+        <div className="flashcard-page">
+          <h1>Questions</h1>
+          <div className="flashcards-list">
+            {currentQuestions && currentAnswers && currentQuestions.length > 0 ? (
+              currentQuestions.map((question, index) => (
+                <div key={index} className="flashcard">
+                  <p><strong>Q:</strong> {question}</p>
+                  <button onClick={() => handleFlip(index)}>
+                    {flippedCards.includes(index) ? 'Hide Answer' : 'Flip to Show Answer'}
+                  </button>
+                  {flippedCards.includes(index) && (
+                    <p><strong>A:</strong> {currentAnswers[index]}</p>
+                  )}
+                  <button className="delete" onClick={() => handleDelete(index)}>
+                    Delete
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>No flashcards to show.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Flashcard Set Name */}
+        <div className="flashcard-name">
+          <button onClick={() => setShowModal(true)} className="save-flashcards-btn">Save Flashcards</button>
+        </div>
+
+        {/* Modal for Name Input */}
+        {showModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>Enter a Name for Your Flashcard Set</h3>
+              <input
+                type="text"
+                placeholder="Enter flashcard set name"
+                value={flashcardName}
+                onChange={(e) => setFlashcardName(e.target.value)}
+              />
+              <div className="modal-actions">
+                <button onClick={handleSave}>Save</button>
+                <button onClick={() => setShowModal(false)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
