@@ -1,22 +1,36 @@
 import { Link } from 'react-router-dom';
 import studentImage from './assets/student-illustration.png';
+import { auth } from './firebase'; // Import Firebase auth
+import { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth'; // Import Firebase auth state change listener
 import './Home.css';
 
 export default function Home() {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
   return (
     <div className="main-container full-screen">
       {/* Navbar */}
       <header className="navbar">
-        <div className="logo">📖 StudyGenius</div>
-        <nav className="navbar-right">
-          <Link to="/">Home</Link>
-          <Link to="/create">Create</Link>
-          <Link to="/study">Study</Link>
-          <Link to="/create">
-            <button className="get-started">Get Started</button>
-          </Link>
-        </nav>
-      </header>
+              <div className="logo">📖 StudyGenius</div>
+              <nav className="navbar-right">
+                <a href="/">Home</a>
+                <a href="/create">Create</a>
+                <a href="/study">Study</a>
+                {user ? (
+                  <button onClick={() => auth.signOut()}>Logout</button>
+                ) : (
+                  <a href="/login">
+                    <button className="get-started">Login</button>
+                  </a>
+                )}
+              </nav>
+            </header>
 
       {/* Centered Content */}
       <main className="content-center">

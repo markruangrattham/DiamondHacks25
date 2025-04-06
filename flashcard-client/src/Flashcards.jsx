@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+
 import { useLocation } from 'react-router-dom';
-import { db, addDoc, collection } from './firebase';  // Import Firestore methods
+import { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db, addDoc, collection } from './firebase';  // Import Firestore methods
+import { useNavigate } from 'react-router-dom';
 import './Flashcards.css';
 
 const Flashcards = () => {
   const { state } = useLocation(); // Access passed state
+  const navigate = useNavigate(); // Initialize navigate hook
   const { questions, answers } = state || {}; // Destructure questions and answers
   const [flippedCards, setFlippedCards] = useState([]); // Track flipped cards
   const [currentQuestions, setCurrentQuestions] = useState(questions); // Track the current set of questions
@@ -15,6 +19,14 @@ const Flashcards = () => {
   const [showNotification, setShowNotification] = useState(false); // State to show notification
   const [showAddNotification, setShowAddNotification] = useState(false); // State for add question notification
   const [showModal, setShowModal] = useState(false); // State for showing modal popup
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleFlip = (index) => {
     setFlippedCards((prev) => {
@@ -55,28 +67,50 @@ const Flashcards = () => {
     setTimeout(() => setShowAddNotification(false), 3000);
   };
 
-  // Function to save the flashcard set to Firestore
   const handleSave = async () => {
+    // Ensure flashcard set name is provided
+    if (!user) {
+      alert("You must be logged in to save the flashcard set.");
+      navigate("/login"); // Redirect user to login page
+      return;
+    }
+  
     if (!flashcardName.trim()) {
       alert('Please enter a name for the flashcard set');
       return;
     }
-
+  
+    // Ensure that questions and answers exist
+    if (currentQuestions.length === 0 || currentAnswers.length === 0) {
+      alert('Please add at least one question and answer.');
+      return;
+    }
+  
     try {
       // Save to Firestore
-      const docRef = await addDoc(collection(db, 'flashcardSets'), {
-        name: flashcardName,
-        questions: currentQuestions,
-        answers: currentAnswers,
-        createdAt: new Date(),
-      });
-      console.log('Flashcard set saved with ID: ', docRef.id);
+      const docRef = await addDoc(
+        collection(db, 'users', user.uid, 'flashcardSets'), // 👈 nested under user
+        {
+          name: flashcardName,
+          flashcards: currentQuestions.map((question, index) => ({
+            question,
+            answer: currentAnswers[index],
+          })),
+          createdAt: new Date(),
+        }
+      );
+  
+      // console.log('Flashcard set saved with ID: ', docRef.id);
       alert('Flashcard set saved successfully!');
+      setShowModal(false); // Close the modal
+      setFlashcardName(''); // Reset the flashcard name input
+
     } catch (e) {
       console.error('Error adding document: ', e);
       alert('Error saving flashcard set');
     }
   };
+  
 
   return (
     <div className="create-container">
@@ -87,6 +121,13 @@ const Flashcards = () => {
           <a href="/">Home</a>
           <a href="/create">Create</a>
           <a href="/study">Study</a>
+          {user ? (
+            <button onClick={() => auth.signOut()}>Logout</button>
+          ) : (
+            <a href="/login">
+              <button className="get-started">Login</button>
+            </a>
+          )}
         </nav>
       </header>
 
@@ -123,18 +164,29 @@ const Flashcards = () => {
           <div className="flashcards-list">
             {currentQuestions && currentAnswers && currentQuestions.length > 0 ? (
               currentQuestions.map((question, index) => (
-                <div key={index} className="flashcard">
-                  <p><strong>Q:</strong> {question}</p>
-                  <button onClick={() => handleFlip(index)}>
-                    {flippedCards.includes(index) ? 'Hide Answer' : 'Flip to Show Answer'}
-                  </button>
-                  {flippedCards.includes(index) && (
+                <div
+                key={index}
+                className={`flashcard ${flippedCards.includes(index) ? 'flipped' : ''}`}
+              >
+                <div className="flashcard-inner">
+                  <div className="flashcard-front">
+                    <p><strong>Q:</strong> {question}</p>
+                  </div>
+                  <div className="flashcard-back">
                     <p><strong>A:</strong> {currentAnswers[index]}</p>
-                  )}
-                  <button className="delete" onClick={() => handleDelete(index)}>
-                    Delete
-                  </button>
+                  </div>
                 </div>
+              
+                <div className="card-controls">
+                <button className="flip" onClick={() => handleFlip(index)}>
+  {flippedCards.includes(index) ? 'Hide Answer' : 'Flip to Show Answer'}
+</button>
+<button className="delete" onClick={() => handleDelete(index)}>
+  Delete
+</button>
+                </div>
+              </div>
+              
               ))
             ) : (
               <p>No flashcards to show.</p>

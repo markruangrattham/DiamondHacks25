@@ -71,7 +71,7 @@ app.post('/upload-pdf', upload.any('pdf'), async (req, res) => {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.0-turbo",
+      model: "gpt-3.5-turbo", 
       messages: [{ role: "user", content: customPrompt }],
       temperature: 0.7
     });

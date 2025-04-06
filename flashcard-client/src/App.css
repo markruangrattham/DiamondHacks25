@@ -208,3 +208,39 @@ button[type="submit"]:disabled {
 .save-btn:hover {
   background-color: #3da344;
 }
+/* Centering the content */
+.create-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Ensures full viewport height */
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Center the content inside the main container */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 800px;
+  width: 100%; /* Ensures it scales on smaller screens */
+}
+
+/* Adjust the file upload container */
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .main-content {
+    width: 90%;  /* Takes up more width on small screens */
+  }
+}
+

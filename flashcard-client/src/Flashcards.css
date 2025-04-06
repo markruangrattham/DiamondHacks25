@@ -6,14 +6,7 @@
     flex-direction: column;
     align-items: center;
   }
-  
-  .flashcards-list {
-    
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
+
   
   /* Flashcard Styling */
   .flashcard {
@@ -57,6 +50,8 @@
     justify-content: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 4px;
+    width: 500px;
+    height: 300px;
   }
   
   .flashcard-back {
@@ -67,6 +62,8 @@
     transform: rotateY(180deg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 4px;
+    width: 500px;
+    height: 300px;
   }
   
   /* Button Styling */
@@ -288,6 +285,31 @@
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+/* Modal Input Field Styling */
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #6c5ce7;  /* Focus color */
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(108, 92, 231, 0.4); /* Soft shadow effect */
+}
+
+.modal-content input::placeholder {
+  color: #888; /* Lighter placeholder text */
+  font-style: italic;
+}
+
 
 .modal button {
   padding: 10px 20px;
@@ -301,4 +323,103 @@
 .modal button:hover {
   background-color: #5a4bcf;
 }
-  
+.flashcards-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.flashcard {
+  width: 320px;
+  height: 220px;
+  perspective: 1000px;
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.flashcard-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+.flashcard-front {
+  background-color: #ffffff;
+}
+
+.flashcard-back {
+  background-color: #f5f5f5;
+  transform: rotateY(180deg);
+}
+
+.card-controls {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-around;
+  padding-top: 1rem;
+}
+
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+button.delete:hover {
+  background-color: #c0392b;
+}
+
+button.flip {
+  background-color: #8e44ad;
+  color: white;
+}
+
+button.flip:hover {
+  background-color: #732d91;
+}
+
+
+
+

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
-import { useNavigate } from 'react-router-dom'; // useNavigate hook
+import { auth, db, addDoc, collection } from './firebase';  // Import Firestore methods
+import { useNavigate } from 'react-router-dom';
 import './Create.css';
 
 export default function Create() {
@@ -35,6 +35,7 @@ export default function Create() {
       setQuestions(data.questions);
       setAnswers(data.answers);
       setInput('');
+     
       navigate('/flashcards', { state: { questions: data.questions, answers: data.answers } }); // Pass data via state
     } catch (err) {
       console.error('Text submission failed', err);
@@ -59,6 +60,8 @@ export default function Create() {
       const data = await res.json();
       setQuestions(data.questions);
       setAnswers(data.answers);
+      // After generating flashcards, save to Firestore
+      
       navigate('/flashcards', { state: { questions: data.questions, answers: data.answers } }); // Pass data via state
     } catch (err) {
       console.error('File upload failed', err);
@@ -66,6 +69,8 @@ export default function Create() {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="create-container">
@@ -129,16 +134,35 @@ export default function Create() {
           </form>
         ) : (
           <form onSubmit={handleFileUpload} className="input-form">
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={(e) => setFile(e.target.files[0])}
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Uploading...' : 'Upload & Generate'}
-            </button>
-          </form>
+          <div className="file-upload-container">
+            <label className="file-upload-label">
+              Choose File
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="file-upload-input"
+              />
+            </label>
+            <div className={`file-upload-status ${file ? 'file-chosen' : ''}`}>
+              {file ? file.name : 'No file chosen'}
+            </div>
+          </div>
+          
+          
+
+  
+          <button type="submit" disabled={loading}>
+            {loading ? 'Uploading...' : 'Upload & Generate'}
+          </button>
+        </form>
+
+        
+        
         )}
+        
+
+       
       </div>
     </div>
   );
